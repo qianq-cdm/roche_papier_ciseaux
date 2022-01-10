@@ -62,7 +62,15 @@ class MyGame(arcade.Window):
         arcade.start_render()
         arcade.draw_text("Roche, papier, ciseaux", self.SCREEN_WIDTH / 5, self.SCREEN_HEIGHT - 40,
                          arcade.color.WHITE, font_size=32)
-        arcade.draw_text(self.state_text, self.SCREEN_WIDTH / 8, self.SCREEN_HEIGHT - 75,
+        if self.game_state == GameState.ROUND_DONE:
+            self.state_text = "Appuyer sur \"Space\" pour commencer\nune nouvelle ronde!"
+        elif self.game_state == GameState.GAME_OVER:
+            pass
+        elif self.game_state == GameState.NOT_STARTED:
+            self.state_text = "Appuyer sur \"Space\" pour commencer"
+        elif self.game_state == GameState.ROUND_ACTIVE:
+            self.state_text = "Appuyer sur une image pour faire une attaque!"
+        arcade.draw_text(self.state_text, 0, self.SCREEN_HEIGHT - 75,
                          arcade.color.WHITE, font_size=24)
         self.player_list.draw()
         self.player_attack_list.draw()
@@ -94,7 +102,6 @@ class MyGame(arcade.Window):
         """
         if key == arcade.key.SPACE:
             self.game_state = GameState.ROUND_ACTIVE
-            self.state_text = "Appuyer sur une image pour faire une attaque!"
 
     def on_mouse_release(self, x, y, button, key_modifiers):
         """
@@ -127,6 +134,31 @@ class MyGame(arcade.Window):
             self.computer_attack = arcade.Sprite("assets/srock-attack.png",
                                                  scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
                                                  center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None")
-            if player_attack == Attacks.PAPER:
+            if player_attack == Attacks.ROCK:
+                pass
+            elif player_attack == Attacks.PAPER:
                 self.player_score += 1
+            else:
+                self.computer_score += 1
+        elif computer_attack == Attacks.PAPER:
+            self.computer_attack = arcade.Sprite("assets/spaper-attack.png",
+                                                 scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
+                                                 center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None")
+            if player_attack == Attacks.PAPER:
+                pass
+            elif player_attack == Attacks.SCISSORS:
+                self.player_score += 1
+            else:
+                self.computer_score += 1
+        else:
+            self.computer_attack = arcade.Sprite("assets/scissors.png",
+                                                 scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
+                                                 center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None")
+            if player_attack == Attacks.SCISSORS:
+                pass
+            elif player_attack == Attacks.ROCK:
+                self.player_score += 1
+            else:
+                self.computer_score += 1
         self.computer_attacked = True
+        self.game_state = GameState.ROUND_DONE
