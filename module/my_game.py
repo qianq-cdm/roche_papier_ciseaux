@@ -19,6 +19,8 @@ class MyGame(arcade.Window):
         self.state_text = None
         self.player_score = None
         self.computer_score = None
+        self.winner = None
+        self.winner_text = None
 
     def setup(self):
         """
@@ -29,6 +31,8 @@ class MyGame(arcade.Window):
         # C'est aussi ici que vous charger les sons de votre jeu.
         self.game_state = GameState.NOT_STARTED
         self.state_text = "Appuyer sur \"Space\" pour commencer"
+        self.winner = ""
+        self.winner_text = ""
         self.player_list.append(arcade.Sprite("assets/faceBeard.png",
                                               scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1.5,
                                               center_y=self.SCREEN_HEIGHT / 5 * 2.5))
@@ -60,17 +64,11 @@ class MyGame(arcade.Window):
         # Cette commande permet d'effacer l'écran avant de dessiner. Elle va dessiner l'arrière
         # plan selon la couleur spécifié avec la méthode "set_background_color".
         arcade.start_render()
-        arcade.draw_text("Roche, papier, ciseaux", self.SCREEN_WIDTH / 5, self.SCREEN_HEIGHT - 40,
+        arcade.draw_text("Roche, papier, ciseaux", 40, self.SCREEN_HEIGHT - 40,
                          arcade.color.WHITE, font_size=32)
-        if self.game_state == GameState.ROUND_DONE:
-            self.state_text = "Appuyer sur \"Space\" pour commencer\nune nouvelle ronde!"
-        elif self.game_state == GameState.GAME_OVER:
-            pass
-        elif self.game_state == GameState.NOT_STARTED:
-            self.state_text = "Appuyer sur \"Space\" pour commencer"
-        elif self.game_state == GameState.ROUND_ACTIVE:
-            self.state_text = "Appuyer sur une image pour faire une attaque!"
-        arcade.draw_text(self.state_text, 0, self.SCREEN_HEIGHT - 75,
+        arcade.draw_text(self.state_text, 40, self.SCREEN_HEIGHT - 75,
+                         arcade.color.WHITE, font_size=24)
+        arcade.draw_text(self.winner_text, 40, self.SCREEN_HEIGHT - 110,
                          arcade.color.WHITE, font_size=24)
         self.player_list.draw()
         self.player_attack_list.draw()
@@ -91,7 +89,30 @@ class MyGame(arcade.Window):
         Paramètre:
             - delta_time : le nombre de milliseconde depuis le dernier update.
         """
-        pass
+        if self.game_state == GameState.ROUND_DONE:
+            self.state_text = "Appuyer sur \"Space\" pour commencer\nune nouvelle ronde!"
+            self.winner_text = f"{self.winner} a gagné la ronde!"
+
+            if self.player_score >= 3:
+                self.winner = "vous avez"
+                self.game_state = GameState.GAME_OVER
+            elif self.computer_score >= 3:
+                self.winner = "l'ordinateur a"
+                self.game_state = GameState.GAME_OVER
+
+        elif self.game_state == GameState.GAME_OVER:
+            self.state_text = "Appuyer sur \"Space\" pour débuter une nouvelle partie!"
+            self.winner_text = f"La partie est terminée, {self.winner} gagné la partie!"
+
+        elif self.game_state == GameState.NOT_STARTED:
+            self.state_text = "Appuyer sur \"Space\" pour commencer"
+            self.winner = ""
+            self.winner_text = ""
+
+        elif self.game_state == GameState.ROUND_ACTIVE:
+            self.state_text = "Appuyer sur une image pour faire une attaque!"
+            self.winner = ""
+            self.winner_text = ""
 
     def on_key_release(self, key, key_modifiers):
         """
@@ -101,7 +122,11 @@ class MyGame(arcade.Window):
             - key_modifiers: est-ce que l'usager appuie sur "shift" ou "ctrl" ?
         """
         if key == arcade.key.SPACE:
-            self.game_state = GameState.ROUND_ACTIVE
+            if self.game_state == GameState.GAME_OVER:
+                self.setup()
+                self.game_state = GameState.ROUND_ACTIVE
+            else:
+                self.game_state = GameState.ROUND_ACTIVE
 
     def on_mouse_release(self, x, y, button, key_modifiers):
         """
@@ -138,8 +163,10 @@ class MyGame(arcade.Window):
                 pass
             elif player_attack == Attacks.PAPER:
                 self.player_score += 1
+                self.winner = "Le joueur"
             else:
                 self.computer_score += 1
+                self.winner = "L'ordinateur"
         elif computer_attack == Attacks.PAPER:
             self.computer_attack = arcade.Sprite("assets/spaper-attack.png",
                                                  scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
@@ -148,8 +175,10 @@ class MyGame(arcade.Window):
                 pass
             elif player_attack == Attacks.SCISSORS:
                 self.player_score += 1
+                self.winner = "Le joueur"
             else:
                 self.computer_score += 1
+                self.winner = "L'ordinateur"
         else:
             self.computer_attack = arcade.Sprite("assets/scissors.png",
                                                  scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
@@ -158,7 +187,9 @@ class MyGame(arcade.Window):
                 pass
             elif player_attack == Attacks.ROCK:
                 self.player_score += 1
+                self.winner = "Le joueur"
             else:
                 self.computer_score += 1
+                self.winner = "L'ordinateur"
         self.computer_attacked = True
         self.game_state = GameState.ROUND_DONE
