@@ -3,6 +3,7 @@ import arcade
 import random
 from module.game_state import GameState
 from module.attacks import Attacks
+from module.attack_animation import AttackAnimation
 
 
 class MyGame(arcade.Window):
@@ -13,7 +14,8 @@ class MyGame(arcade.Window):
         arcade.set_background_color(arcade.csscolor.SLATE_GRAY)
         self.game_state = None
         self.player_list = arcade.SpriteList()
-        self.player_attack_list = arcade.SpriteList()
+        self.player_attack_list_0 = arcade.SpriteList()
+        self.player_attack_list_1 = arcade.SpriteList()
         self.computer_attack = None
         self.computer_attacked = None
         self.state_text = None
@@ -21,6 +23,7 @@ class MyGame(arcade.Window):
         self.computer_score = None
         self.winner = None
         self.winner_text = None
+        self.attack_animation = None
 
     def setup(self):
         """
@@ -33,27 +36,38 @@ class MyGame(arcade.Window):
         self.state_text = "Appuyer sur \"Space\" pour commencer"
         self.winner = ""
         self.winner_text = ""
+        self.computer_attacked = False
+        self.player_score = 0
+        self.computer_score = 0
         self.player_list.append(arcade.Sprite("assets/faceBeard.png",
                                               scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1.5,
                                               center_y=self.SCREEN_HEIGHT / 5 * 2.5))
         self.player_list.append(arcade.Sprite("assets/compy.png",
                                               scale=2.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
                                               center_y=self.SCREEN_HEIGHT / 5 * 2.5))
-        self.player_attack_list.append(arcade.Sprite("assets/srock.png",
-                                                     scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1,
-                                                     center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
-        self.player_attack_list.append(arcade.Sprite("assets/spaper.png",
-                                                     scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1.5,
-                                                     center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
-        self.player_attack_list.append(arcade.Sprite("assets/scissors.png",
-                                                     scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 2,
-                                                     center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
         self.computer_attack = arcade.Sprite("assets/srock.png",
                                              scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
                                              center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None")
-        self.computer_attacked = False
-        self.player_score = 0
-        self.computer_score = 0
+        self.player_attack_list_0.append(arcade.Sprite("assets/srock.png",
+                                             scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1,
+                                             center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
+        self.player_attack_list_0.append(arcade.Sprite("assets/spaper.png",
+                                                     scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1.5,
+                                                     center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
+        self.player_attack_list_0.append(arcade.Sprite("assets/scissors.png",
+                                                     scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 2,
+                                                     center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
+        self.player_attack_list_1.append(arcade.Sprite("assets/srock-attack.png",
+                                                     scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1,
+                                                     center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
+        self.player_attack_list_1.append(arcade.Sprite("assets/spaper-attack.png",
+                                                     scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1.5,
+                                                     center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
+        self.player_attack_list_1.append(arcade.Sprite("assets/scissors-close.png",
+                                                     scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 2,
+                                                     center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
+        self.attack_animation = AttackAnimation(0.8, self.player_attack_list_0, self.player_attack_list_1)
+        
 
     def on_draw(self):
         """
@@ -71,8 +85,7 @@ class MyGame(arcade.Window):
         arcade.draw_text(self.winner_text, 40, self.SCREEN_HEIGHT - 110,
                          arcade.color.WHITE, font_size=24)
         self.player_list.draw()
-        self.player_attack_list.draw()
-        self.player_attack_list.draw_hit_boxes()
+        self.attack_animation.draw()
         if self.computer_attacked:
             self.computer_attack.draw()
         self.computer_attack.draw_hit_box()
@@ -90,6 +103,7 @@ class MyGame(arcade.Window):
             - delta_time : le nombre de milliseconde depuis le dernier update.
         """
         if self.game_state == GameState.ROUND_DONE:
+            self.attack_animation.set_activate_animation(False)
             self.state_text = "Appuyer sur \"Space\" pour commencer\nune nouvelle ronde!"
             self.winner_text = f"{self.winner} a gagné la ronde!"
 
@@ -101,18 +115,23 @@ class MyGame(arcade.Window):
                 self.game_state = GameState.GAME_OVER
 
         elif self.game_state == GameState.GAME_OVER:
+            self.attack_animation.set_activate_animation(False)
             self.state_text = "Appuyer sur \"Space\" pour débuter une nouvelle partie!"
             self.winner_text = f"La partie est terminée, {self.winner} gagné la partie!"
 
         elif self.game_state == GameState.NOT_STARTED:
+            self.attack_animation.set_activate_animation(False)
             self.state_text = "Appuyer sur \"Space\" pour commencer"
             self.winner = ""
             self.winner_text = ""
 
         elif self.game_state == GameState.ROUND_ACTIVE:
+            self.attack_animation.set_activate_animation(True)
             self.state_text = "Appuyer sur une image pour faire une attaque!"
             self.winner = ""
             self.winner_text = ""
+            
+        self.attack_animation.update(delta_time)
 
     def on_key_release(self, key, key_modifiers):
         """
@@ -137,9 +156,9 @@ class MyGame(arcade.Window):
             - key_modifiers: est-ce que l'usager appuie sur "shift" ou "ctrl" ?
         """
         if button == arcade.MOUSE_BUTTON_LEFT and self.game_state == GameState.ROUND_ACTIVE:
-            rock = self.player_attack_list.sprite_list[Attacks.ROCK.value]
-            paper = self.player_attack_list.sprite_list[Attacks.PAPER.value]
-            scissors = self.player_attack_list.sprite_list[Attacks.SCISSORS.value]
+            rock = self.player_attack_list_0.sprite_list[Attacks.ROCK.value]
+            paper = self.player_attack_list_0.sprite_list[Attacks.PAPER.value]
+            scissors = self.player_attack_list_0.sprite_list[Attacks.SCISSORS.value]
             if rock.left < x < rock.right and rock.bottom < y < rock.top:
                 self.player_attacked(Attacks.ROCK)
             elif paper.left < x < paper.right and paper.bottom < y < paper.top:
@@ -160,7 +179,7 @@ class MyGame(arcade.Window):
                                                  scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
                                                  center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None")
             if player_attack == Attacks.ROCK:
-                pass
+                self.winner = "Personne"
             elif player_attack == Attacks.PAPER:
                 self.player_score += 1
                 self.winner = "Le joueur"
@@ -172,7 +191,7 @@ class MyGame(arcade.Window):
                                                  scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
                                                  center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None")
             if player_attack == Attacks.PAPER:
-                pass
+                self.winner = "Personne"
             elif player_attack == Attacks.SCISSORS:
                 self.player_score += 1
                 self.winner = "Le joueur"
@@ -184,7 +203,7 @@ class MyGame(arcade.Window):
                                                  scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
                                                  center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None")
             if player_attack == Attacks.SCISSORS:
-                pass
+                self.winner = "Personne"
             elif player_attack == Attacks.ROCK:
                 self.player_score += 1
                 self.winner = "Le joueur"

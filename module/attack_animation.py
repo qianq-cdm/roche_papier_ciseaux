@@ -1,32 +1,35 @@
-import arcade
-import pathlib
-
-SPRITE_SCALING = 0.5
+from re import S
 
 
-class AttackAnimation(arcade.Sprite):
-    def __init__(self, center_x, center_y):
-        super().__init__()
-        self.scale = SPRITE_SCALING
-        self.textures = []
-        self.using_texture = 0
-        self.delta_time = 0
-
-        self.center_x = center_x
-        self.center_y = center_y
-
-    def add_texture(self, path: str):
-        texture = arcade.load_texture(f"{path}")
-        self.textures.append(texture)
-
+class AttackAnimation():
+    def __init__(self, animation_update_time, frame_list_0, frame_list_1):
+        self.activate_animation = False
+        self.frame_count = 0
+        self.since_last_frame_update = 0
+        
+        self.animation_update_time = animation_update_time
+        
+        self.frame_list_0 = frame_list_0
+        self.frame_list_1 = frame_list_1
+        
+    def set_activate_animation(self, activate_animation):
+        self.activate_animation = activate_animation
+        
     def draw(self):
-        self.texture = self.textures[self.using_texture]
-
+        if self.activate_animation and self.frame_count == 1:
+            self.frame_list_1.draw()
+            self.frame_list_1.draw_hit_boxes()
+        else:
+            self.frame_list_0.draw()
+            self.frame_list_0.draw_hit_boxes()
+        
     def update(self, delta_time):
-        self.delta_time += delta_time
-        if 1000 <= self.delta_time:
-            if self.using_texture == len(self.textures) - 1:
-                self.using_texture = 0
-            else:
-                self.using_texture += 1
-            self.delta_time = 0
+        if self.activate_animation:
+            self.since_last_frame_update += delta_time
+            if (self.since_last_frame_update > self.animation_update_time):
+                self.frame_count = (self.frame_count + 1) % 2
+                self.since_last_frame_update = 0.0
+                print("Animation updated")
+        else:
+            self.since_last_frame_update = 0.0
+        
