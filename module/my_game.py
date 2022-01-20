@@ -71,27 +71,26 @@ class MyGame(arcade.Window):
                                              center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None")
         # First set of frame for gamer attack animation
         self.player_attack_list_0.append(arcade.Sprite("assets/srock.png",
-                                             scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1,
-                                             center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
+                                                       scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1,
+                                                       center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
         self.player_attack_list_0.append(arcade.Sprite("assets/spaper.png",
-                                                     scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1.5,
-                                                     center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
+                                                       scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1.5,
+                                                       center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
         self.player_attack_list_0.append(arcade.Sprite("assets/scissors.png",
-                                                     scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 2,
-                                                     center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
+                                                       scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 2,
+                                                       center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
         # Second set of frame for gamer attack animation
         self.player_attack_list_1.append(arcade.Sprite("assets/srock-attack.png",
-                                                     scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1,
-                                                     center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
+                                                       scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1,
+                                                       center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
         self.player_attack_list_1.append(arcade.Sprite("assets/spaper-attack.png",
-                                                     scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1.5,
-                                                     center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
+                                                       scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 1.5,
+                                                       center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
         self.player_attack_list_1.append(arcade.Sprite("assets/scissors-close.png",
-                                                     scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 2,
-                                                     center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
+                                                       scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 2,
+                                                       center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
         # Create class of animation
         self.attack_animation = AttackAnimation(0.5, self.player_attack_list_0, self.player_attack_list_1)
-        
 
     def on_draw(self):
         """
@@ -122,10 +121,12 @@ class MyGame(arcade.Window):
         # Draw the border line for computer's attack
         self.computer_attack.draw_hit_box()
         # Score of player
-        arcade.draw_text(f"Le pointage du joueur est {self.player_score}", self.SCREEN_WIDTH / 5 * 0.7, self.SCREEN_HEIGHT / 5 * 0.7,
+        arcade.draw_text(f"Le pointage du joueur est {self.player_score}", self.SCREEN_WIDTH / 5 * 0.7,
+                         self.SCREEN_HEIGHT / 5 * 0.7,
                          arcade.color.WHITE, font_size=16)
         # Score of computer
-        arcade.draw_text(f"Le pointage d'ordinateur est {self.computer_score}", self.SCREEN_WIDTH / 5 * 2.7, self.SCREEN_HEIGHT / 5 * 0.7,
+        arcade.draw_text(f"Le pointage d'ordinateur est {self.computer_score}", self.SCREEN_WIDTH / 5 * 2.7,
+                         self.SCREEN_HEIGHT / 5 * 0.7,
                          arcade.color.WHITE, font_size=16)
 
     def on_update(self, delta_time):
@@ -182,7 +183,7 @@ class MyGame(arcade.Window):
             self.state_text = "Appuyer sur une image pour faire une attaque!"
             # Clear the winner text
             self.winner_text = ""
-            
+
         self.attack_animation.update(delta_time)
 
     def on_key_release(self, key, key_modifiers):

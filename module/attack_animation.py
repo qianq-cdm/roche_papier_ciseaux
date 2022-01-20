@@ -53,4 +53,3 @@ class AttackAnimation():
             # Animation not activated
             # Keep the timer at 0
             self.since_last_frame_update = 0.0
-        
