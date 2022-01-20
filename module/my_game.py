@@ -66,7 +66,7 @@ class MyGame(arcade.Window):
         self.player_attack_list_1.append(arcade.Sprite("assets/scissors-close.png",
                                                      scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 2,
                                                      center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None"))
-        self.attack_animation = AttackAnimation(0.8, self.player_attack_list_0, self.player_attack_list_1)
+        self.attack_animation = AttackAnimation(0.5, self.player_attack_list_0, self.player_attack_list_1)
         
 
     def on_draw(self):

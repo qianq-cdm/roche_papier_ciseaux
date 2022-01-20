@@ -1,6 +1,3 @@
-from re import S
-
-
 class AttackAnimation():
     def __init__(self, animation_update_time, frame_list_0, frame_list_1):
         self.activate_animation = False
