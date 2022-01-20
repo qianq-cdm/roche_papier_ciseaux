@@ -1,3 +1,7 @@
+"""
+Enum for different attacks
+"""
+
 from enum import Enum
 
 

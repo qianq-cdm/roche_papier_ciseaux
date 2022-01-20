@@ -1,3 +1,7 @@
+"""
+Enum for state of game
+"""
+
 from enum import Enum
 
 

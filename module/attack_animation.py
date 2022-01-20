@@ -1,3 +1,8 @@
+"""
+Author: Qian Qian
+Class for animation for player's attacks
+"""
+
 class AttackAnimation():
     def __init__(self, animation_update_time, frame_list_0, frame_list_1):
         """
