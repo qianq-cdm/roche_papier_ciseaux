@@ -3,6 +3,8 @@ Author: Qian Qian
 Class for animation for player's attacks
 """
 
+from module.game_state import GameState
+
 class AttackAnimation():
     def __init__(self, animation_update_time, frame_list_0, frame_list_1):
         """
@@ -26,7 +28,7 @@ class AttackAnimation():
         # activate/deactivate animation
         self.activate_animation = activate_animation
         
-    def draw(self):
+    def draw(self, game_state):
         # Draw frames
         if self.activate_animation and self.frame_count == 1:
             # Draw second set of frame
@@ -34,7 +36,8 @@ class AttackAnimation():
             self.frame_list_1.draw_hit_boxes()
         else:
             # Draw first set of frame
-            self.frame_list_0.draw()
+            if game_state != GameState.NOT_STARTED:
+                self.frame_list_0.draw()
             self.frame_list_0.draw_hit_boxes()
         
     def update(self, delta_time):

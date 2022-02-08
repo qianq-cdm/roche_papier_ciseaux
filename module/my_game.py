@@ -113,7 +113,7 @@ class MyGame(arcade.Window):
         # Draw sprites for both players
         self.player_list.draw()
         # Draw the attack animation
-        self.attack_animation.draw()
+        self.attack_animation.draw(self.game_state)
         # If computer attacked
         if self.computer_attacked:
             # Draw the attack of animation
@@ -177,6 +177,8 @@ class MyGame(arcade.Window):
 
         elif self.game_state == GameState.ROUND_ACTIVE:
             # Round is active
+            # Reset computer attack
+            self.computer_attacked = False
             # Start the animation
             self.attack_animation.set_activate_animation(True)
             # Tell the player how to attack
