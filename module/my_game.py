@@ -68,9 +68,13 @@ class MyGame(arcade.Window):
                                               scale=2.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
                                               center_y=self.SCREEN_HEIGHT / 5 * 2.5))
         # Sprite for computer's attack
-        self.computer_attack = arcade.Sprite("assets/srock.png",
-                                             scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
+        self.computer_attack = arcade.Sprite(scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
                                              center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None")
+        self.computer_attack.textures = [
+            arcade.load_texture("assets/srock-attack.png"),
+            arcade.load_texture("assets/spaper-attack.png"),
+            arcade.load_texture("assets/scissors-close.png")
+        ]
         # Player's attacks
         self.player_attack_rock = AttackAnimation(Attacks.ROCK, self.SCREEN_WIDTH / 5 * 1,
                                                   self.SCREEN_HEIGHT / 5 * 1.2)
@@ -79,7 +83,7 @@ class MyGame(arcade.Window):
         self.player_attack_scissors = AttackAnimation(Attacks.SCISSORS, self.SCREEN_WIDTH / 5 * 2,
                                                       self.SCREEN_HEIGHT / 5 * 1.2)
 
-    def draw_box_for_player_attacks(self):
+    def draw_box_for_attacks(self):
         # Draw the box for player attacks
         # Box of player attack rock
         arcade.draw_rectangle_outline(
@@ -101,6 +105,14 @@ class MyGame(arcade.Window):
         arcade.draw_rectangle_outline(
             center_x=self.player_attack_scissors.center_x,
             center_y=self.player_attack_scissors.center_y,
+            width=75,
+            height=75,
+            color=arcade.color.BLACK
+        )
+        # Box of computer attacks
+        arcade.draw_rectangle_outline(
+            center_x=self.computer_attack.center_x,
+            center_y=self.computer_attack.center_y,
             width=75,
             height=75,
             color=arcade.color.BLACK
@@ -150,14 +162,13 @@ class MyGame(arcade.Window):
         self.player_list.draw()
         # Draw attacks for player
         self.draw_player_attack()
-        # Draw the attack animation
-        self.draw_box_for_player_attacks()
         # If computer attacked
         if self.computer_attacked:
             # Draw the attack of animation
             self.computer_attack.draw()
+        # Draw the boxes around the attacks
+        self.draw_box_for_attacks()
         # Draw the border line for computer's attack
-        self.computer_attack.draw_hit_box()
         self.draw_scores()
 
     def set_activate_animation(self, activate):
@@ -288,9 +299,7 @@ class MyGame(arcade.Window):
         if computer_attack == Attacks.ROCK:
             # Computer's attack is rock
             # Draw attack
-            self.computer_attack = arcade.Sprite("assets/srock-attack.png",
-                                                 scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
-                                                 center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None")
+            self.computer_attack.set_texture(Attacks.ROCK.value)
             if self.player_attack == Attacks.ROCK:
                 # Nobody wins
                 self.winner = "Personne"
@@ -305,9 +314,7 @@ class MyGame(arcade.Window):
         elif computer_attack == Attacks.PAPER:
             # Computer's attack is paper
             # Draw attack
-            self.computer_attack = arcade.Sprite("assets/spaper-attack.png",
-                                                 scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
-                                                 center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None")
+            self.computer_attack.set_texture(Attacks.PAPER.value)
             if self.player_attack == Attacks.PAPER:
                 # Nobody wins
                 self.winner = "Personne"
@@ -322,9 +329,7 @@ class MyGame(arcade.Window):
         else:
             # Computer's attack is scissors
             # Draw attack
-            self.computer_attack = arcade.Sprite("assets/scissors.png",
-                                                 scale=0.5, center_x=self.SCREEN_WIDTH / 5 * 3.5,
-                                                 center_y=self.SCREEN_HEIGHT / 5 * 1.2, hit_box_algorithm="None")
+            self.computer_attack.set_texture(Attacks.SCISSORS.value)
             if self.player_attack == Attacks.SCISSORS:
                 # Nobody wins
                 self.winner = "Personne"
