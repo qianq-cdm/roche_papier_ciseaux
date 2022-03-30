@@ -3,56 +3,65 @@ Author: Qian Qian
 Class for animation for player's attacks
 """
 
-from module.game_state import GameState
+import arcade
+from module.attacks import Attacks
 
-class AttackAnimation():
-    def __init__(self, animation_update_time, frame_list_0, frame_list_1):
-        """
-        Initialize an attack animation class
-        :param animation_update_time: time between updates
-        :param frame_list_0: first set of frame
-        :param frame_list_1: second set of frame
-        """
-        self.activate_animation = False
-        self.frame_count = 0
-        self.since_last_frame_update = 0
 
-        # Time between updates
-        self.animation_update_time = animation_update_time
+class AttackAnimation(arcade.Sprite):
+    ATTACK_SCALE = 0.50
+    ANIMATION_SPEED = 5.0
 
-        # Sets of frames
-        self.frame_list_0 = frame_list_0
-        self.frame_list_1 = frame_list_1
-        
+    def __init__(self, attack_type, center_x, center_y):
+        # Initialize the Sprite
+        super().__init__(center_x=center_x, center_y=center_y)
+
+        self.attack_type = attack_type
+        if self.attack_type == Attacks.ROCK:
+            # Textures for ROCK
+            self.textures = [
+                arcade.load_texture("assets/srock.png"),
+                arcade.load_texture("assets/srock-attack.png")
+            ]
+        elif self.attack_type == Attacks.PAPER:
+            # Textures for PAPER
+            self.textures = [
+                arcade.load_texture("assets/spaper.png"),
+                arcade.load_texture("assets/spaper-attack.png")
+            ]
+        else:
+            # Textures for SCISSORS
+            self.textures = [
+                arcade.load_texture("assets/scissors.png"),
+                arcade.load_texture("assets/scissors-close.png")
+            ]
+
+        # Scale of the image
+        self.scale = self.ATTACK_SCALE
+        self.current_texture = 0
+        self.set_texture(self.current_texture)
+        self.animation_update_time = 1.0 / AttackAnimation.ANIMATION_SPEED
+        self.time_since_last_swap = 0.0
+
     def set_activate_animation(self, activate_animation):
         # activate/deactivate animation
         self.activate_animation = activate_animation
-        
-    def draw(self, game_state):
-        # Draw frames
-        if self.activate_animation and self.frame_count == 1:
-            # Draw second set of frame
-            self.frame_list_1.draw()
-            self.frame_list_1.draw_hit_boxes()
-        else:
-            # Draw first set of frame
-            if game_state != GameState.NOT_STARTED:
-                self.frame_list_0.draw()
-            self.frame_list_0.draw_hit_boxes()
-        
-    def update(self, delta_time):
-        # Update frame
-        if self.activate_animation:
-            # Animation activated
-            # Calculate the time from last update
-            self.since_last_frame_update += delta_time
-            if self.since_last_frame_update > self.animation_update_time:
-                # If it is long enough for update
-                # Switch the set of frame
-                self.frame_count = (self.frame_count + 1) % 2
-                # Clear the timer
-                self.since_last_frame_update = 0.0
-        else:
-            # Animation not activated
-            # Keep the timer at 0
-            self.since_last_frame_update = 0.0
+
+    def on_update(self, delta_time: float = 1 / 60):
+        # Update the animation.
+        # Animation note activated
+        if not self.activate_animation:
+            return
+
+        # Add time to timer
+        self.time_since_last_swap += delta_time
+        # If timer meets the requirement
+        if self.time_since_last_swap > self.animation_update_time:
+            # Change texture
+            self.current_texture += 1
+            if self.current_texture >= len(self.textures):
+                # Prevent array out of bound
+                self.current_texture = 0
+            self.set_texture(self.current_texture)
+            # Reset the timer
+            self.time_since_last_swap = 0.0
+
